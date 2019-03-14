@@ -33,10 +33,214 @@ Window {
 
     Column {
         id: control_column
-        width: 220
-        height: 330
+        width: 200
+        height: 300
         anchors.top: canvas.top
+        anchors.topMargin: 15
         anchors.left: canvas.right
+        anchors.leftMargin: 20
+        spacing: 5
+
+        Label {
+            id: ap1label
+            text: "AP NO.1:"
+            font.bold: true
+            font.pixelSize: 20
+            color: "black"
+        }
+
+        Row {
+            id: ap1row
+            width: 200
+            height: 30
+            spacing: 10
+
+            Text {
+                text: "x:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap1x
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+
+            Text {
+                text: "y:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap1y
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+        }
+
+        Label {
+            id: ap2label
+            text: "AP NO.2:"
+            font.bold: true
+            font.pixelSize: 20
+            color: "black"
+        }
+
+        Row {
+            id: ap2row
+            width: 200
+            height: 30
+            spacing: 10
+
+            Text {
+                text: "x:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap2x
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+            Text {
+                text: "y:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap2y
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+        }
+
+        Label {
+            id: ap3label
+            text: "AP NO.3:"
+            font.bold: true
+            font.pixelSize: 20
+            color: "black"
+        }
+
+        Row {
+            id: ap3row
+            width: 200
+            height: 30
+            spacing: 10
+
+            Text {
+                text: "x:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap3x
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+            Text {
+                text: "y:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap3y
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+        }
+
+        Label {
+            id: ap4label
+            text: "AP NO.4:"
+            font.bold: true
+            font.pixelSize: 20
+            color: "black"
+        }
+
+        Row {
+            id: ap4row
+            width: 200
+            height: 30
+            spacing: 10
+
+            Text {
+                text: "x:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap4x
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+            Text {
+                text: "y:"
+                font.pixelSize: 20
+            }
+            TextField {
+                id: ap4y
+                width: 40
+                height: 20
+                font.pixelSize: 20
+            }
+        }
+
+        Row {
+            width: 200
+            height: 30
+            spacing: 30
+
+            Button {
+                id: runbutton
+                width: 60
+                height: 30
+                background: Rectangle {
+                    implicitHeight: parent.height
+                    implicitWidth: parent.width
+                    color: "mediumseagreen"
+                    radius: 10
+                }
+                Text {
+                    text: qsTr("Run")
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    width: parent.width
+                    height: parent.height
+                    color: "white"
+                    font.pixelSize: 20
+                }
+                onClicked:  {
+                    console.log("Start...")
+                }
+            }
+
+            Button {
+                id: stopbutton
+                width: 60
+                height: 30
+                background: Rectangle {
+                    implicitHeight: parent.height
+                    implicitWidth: parent.width
+                    color: "tomato"
+                    radius: 10
+                }
+                Text {
+                    text: qsTr("Stop")
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    width: parent.width
+                    height: parent.height
+                    color: "white"
+                    font.pixelSize: 20
+                }
+                onClicked:  {
+                    console.log("Stop...")
+                }
+            }
+        }
+
+
     }
 
     Row {
