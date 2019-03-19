@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.11
 import Process 1.0
+import an.Qt.QmlObject 1.0
 
 Window {
     visible: true
@@ -21,6 +22,10 @@ Window {
     property int yx
     property int apxX: 1
     property int apxY: 2
+
+    QmlObject {
+        id: algriothm
+    }
 
 
     Label {
@@ -355,6 +360,8 @@ Window {
                         if(apxX !== 0 && apxY !== 0){
                             apx.visible = true
                             apx_text.visible = true
+                            console.log("apxX=", apxX)
+                            console.log("apxY=", apxY)
                             fake_run.start()
                         }
 
@@ -400,7 +407,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
 
-        Image {
+       /* Image {
             id: ucr
             width: 65
             height: 65
@@ -418,7 +425,7 @@ Window {
             width: 65
             height: 64
             source: "images/96.png"
-        }
+        }*/
 
     }
 
@@ -460,19 +467,26 @@ Window {
             notify_text.visible = false
         }
     }
+
     Timer {
         id: fake_run
         interval:1000
         running: false
         repeat: true
         onTriggered: {
-            if(apxX < 7 || apxY < 8){
+            /*if(apxX < 7 || apxY < 8){
                 apxX ++
                 apxY ++
             } else {
                 apxX--
                 apxY--
             }
+            apxX = global_apxX;
+            apxY = global_apxY;
+            */
+            apxX = algriothm.get_x()
+            console.log("fake_run start!!!!")
+            apxY = algriothm.get_y()
         }
     }
 
