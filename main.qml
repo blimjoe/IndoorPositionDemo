@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.11
 import Process 1.0
+import an.Qt.QmlObject 1.0
 
 Window {
     visible: true
@@ -20,7 +21,14 @@ Window {
     property int y4
     property int yx
     property int apxX: 1
-    property int apxY: 2
+    property int apxY: 1
+    property int d1
+    property int d2
+    property int d3
+
+    QmlObject {
+        id: algriothm
+    }
 
 
     Label {
@@ -56,6 +64,19 @@ Window {
             anchors.left: parent.left
             anchors.leftMargin: 80
         }
+        Rectangle {
+            id: cir1
+            width: 240/ap2x.text*d1
+            height: cir1.width
+            radius: cir1.width/2
+            color: "green"
+            opacity: 0.3
+            anchors.centerIn: ap1
+            Component.onCompleted: {
+                console.log("cir1=", cir1)
+            }
+        }
+
         Text {
             id: ap1_text
             text: "AP1("+ap1x.text+","+ap1y.text+")"
@@ -336,7 +357,10 @@ Window {
                     font.pixelSize: 20
                 }
                 onClicked:  {
-                    console.log("Start...")
+                    //d1 = algriothm.dis1()
+                    //console.log("d1=,",d1)
+                    //console.log("algorithm.send_dis1 = ",algriothm.dis1())
+                    //console.log("Start...")
                     if(ap1x.text.length > 0 && ap1y.text.length > 0 && ap2x.text.length > 0 && ap2y.text.length > 0 && ap3x.text.length > 0 && ap3y.text.length > 0 && ap4x.text.length > 0 && ap4y.text.length > 0) {
                         console.log("input correct")
                         x1 = ap1x.text
@@ -355,6 +379,11 @@ Window {
                         if(apxX !== 0 && apxY !== 0){
                             apx.visible = true
                             apx_text.visible = true
+                            console.log("apxX=", apxX)
+                            console.log("apxY=", apxY)
+                            console.log("in qml: ", x1,y1, x2, y2, x3, y3)
+                            algriothm.get_ap(x1, y1, x2, y2, x3, y3);
+                            //algriothm.get_ap(1,2,3,4,5,6)
                             fake_run.start()
                         }
 
@@ -400,7 +429,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
 
-        Image {
+       /* Image {
             id: ucr
             width: 65
             height: 65
@@ -418,7 +447,7 @@ Window {
             width: 65
             height: 64
             source: "images/96.png"
-        }
+        }*/
 
     }
 
@@ -460,19 +489,26 @@ Window {
             notify_text.visible = false
         }
     }
+
     Timer {
         id: fake_run
         interval:1000
         running: false
         repeat: true
         onTriggered: {
-            if(apxX < 7 || apxY < 8){
+            /*if(apxX < 7 || apxY < 8){
                 apxX ++
                 apxY ++
             } else {
                 apxX--
                 apxY--
             }
+            apxX = global_apxX;
+            apxY = global_apxY;
+            */
+            apxX = algriothm.get_x()
+            console.log("fake_run start!!!!")
+            apxY = algriothm.get_y()
         }
     }
 
