@@ -21,7 +21,10 @@ Window {
     property int y4
     property int yx
     property int apxX: 1
-    property int apxY: 2
+    property int apxY: 1
+    property int d1
+    property int d2
+    property int d3
 
     QmlObject {
         id: algriothm
@@ -61,6 +64,19 @@ Window {
             anchors.left: parent.left
             anchors.leftMargin: 80
         }
+        Rectangle {
+            id: cir1
+            width: 240/ap2x.text*d1
+            height: cir1.width
+            radius: cir1.width/2
+            color: "green"
+            opacity: 0.3
+            anchors.centerIn: ap1
+            Component.onCompleted: {
+                console.log("cir1=", cir1)
+            }
+        }
+
         Text {
             id: ap1_text
             text: "AP1("+ap1x.text+","+ap1y.text+")"
@@ -341,7 +357,10 @@ Window {
                     font.pixelSize: 20
                 }
                 onClicked:  {
-                    console.log("Start...")
+                    //d1 = algriothm.dis1()
+                    //console.log("d1=,",d1)
+                    //console.log("algorithm.send_dis1 = ",algriothm.dis1())
+                    //console.log("Start...")
                     if(ap1x.text.length > 0 && ap1y.text.length > 0 && ap2x.text.length > 0 && ap2y.text.length > 0 && ap3x.text.length > 0 && ap3y.text.length > 0 && ap4x.text.length > 0 && ap4y.text.length > 0) {
                         console.log("input correct")
                         x1 = ap1x.text
@@ -362,6 +381,9 @@ Window {
                             apx_text.visible = true
                             console.log("apxX=", apxX)
                             console.log("apxY=", apxY)
+                            console.log("in qml: ", x1,y1, x2, y2, x3, y3)
+                            algriothm.get_ap(x1, y1, x2, y2, x3, y3);
+                            //algriothm.get_ap(1,2,3,4,5,6)
                             fake_run.start()
                         }
 
