@@ -22,9 +22,9 @@ Window {
     property int yx
     property int apxX: 1
     property int apxY: 1
-    property int d1
-    property int d2
-    property int d3
+    property int d1: algriothm.dis1()*2
+    property int d2: algriothm.dis2()*2
+    property int d3: algriothm.dis3()*2
 
     QmlObject {
         id: algriothm
@@ -69,11 +69,12 @@ Window {
             width: 240/ap2x.text*d1
             height: cir1.width
             radius: cir1.width/2
-            color: "green"
+            color: "cornflowerblue"
             opacity: 0.3
             anchors.centerIn: ap1
+            visible: false
             Component.onCompleted: {
-                console.log("cir1=", cir1)
+                console.log("cir1=", d1)
             }
         }
 
@@ -99,6 +100,19 @@ Window {
             anchors.right: parent.right
             anchors.rightMargin: 80
         }
+        Rectangle {
+            id: cir2
+            width: 240/ap2x.text*d2
+            height: cir2.width
+            radius: cir2.width/2
+            color: "red"
+            opacity: 0.3
+            anchors.centerIn: ap2
+            visible: false
+            Component.onCompleted: {
+                console.log("cir2=", d2)
+            }
+        }
         Text {
             id: ap2_text
             text: "AP2("+ap2x.text+","+ap2y.text+")"
@@ -119,6 +133,19 @@ Window {
             anchors.left: ap1.left
             anchors.top: parent.top
             anchors.topMargin: 80
+        }
+        Rectangle {
+            id: cir3
+            width: 240/ap2x.text*d3
+            height: cir3.width
+            radius: cir3.width/2
+            color: "green"
+            opacity: 0.3
+            anchors.centerIn: ap3
+            visible: false
+            Component.onCompleted: {
+                console.log("cir3=", d3)
+            }
         }
         Text {
             id: ap3_text
@@ -357,7 +384,7 @@ Window {
                     font.pixelSize: 20
                 }
                 onClicked:  {
-                    //d1 = algriothm.dis1()
+
                     //console.log("d1=,",d1)
                     //console.log("algorithm.send_dis1 = ",algriothm.dis1())
                     //console.log("Start...")
@@ -429,25 +456,25 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
 
-       /* Image {
+       Image {
             id: ucr
             width: 65
             height: 65
-            source: "images/ucr.png"
+            source: "ucr.png"
 
         }
         Image {
             id: unisoc
             width: 65
             height: 65
-            source: "images/unisoc.png"
+            source: "unisoc.png"
         }
         Image {
             id: linaro
             width: 65
             height: 64
-            source: "images/96.png"
-        }*/
+            source: "96.png"
+        }
 
     }
 
@@ -507,8 +534,11 @@ Window {
             apxY = global_apxY;
             */
             apxX = algriothm.get_x()
-            console.log("fake_run start!!!!")
+            console.log("indoor position start!!!!")
             apxY = algriothm.get_y()
+            cir1.visible = true
+            cir2.visible = true
+            cir3.visible = true
         }
     }
 

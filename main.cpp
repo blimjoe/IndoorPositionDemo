@@ -243,6 +243,7 @@ int global_apxX=0;
 int global_apxY=0;
 int d1,d2,d3;
 struct pointinfo info;
+
 class MyObject : public QObject
 {
     Q_OBJECT
