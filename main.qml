@@ -48,6 +48,7 @@ Window {
         id: canvas
         width: 400
         height: 380
+        clip: true
         border.color: "grey"
         border.width: 2
         x: 20
@@ -411,6 +412,7 @@ Window {
                             console.log("in qml: ", x1,y1, x2, y2, x3, y3)
                             algriothm.get_ap(x1, y1, x2, y2, x3, y3);
                             //algriothm.get_ap(1,2,3,4,5,6)
+                            algriothm.start(1)
                             fake_run.start()
                         }
 
@@ -442,6 +444,8 @@ Window {
                 }
                 onClicked:  {
                     console.log("Stop...")
+                    algriothm.start(0)
+                    fake_run.stop()
                 }
             }
         }
