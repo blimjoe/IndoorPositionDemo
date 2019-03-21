@@ -242,7 +242,9 @@ void get_coordinate(int *x,int *y)
 int global_apxX=0;
 int global_apxY=0;
 int d1,d2,d3;
+int Sig = 0;
 struct pointinfo info;
+
 class MyObject : public QObject
 {
     Q_OBJECT
@@ -255,6 +257,7 @@ public:
     Q_INVOKABLE int dis2();
     Q_INVOKABLE int dis3();
     Q_INVOKABLE int get_ap(int x1, int y1, int x2, int y2, int x3, int y3);
+    Q_INVOKABLE int start(int sig);
 };
 MyObject::MyObject(QObject *parent)
 {
@@ -304,6 +307,12 @@ int MyObject::get_ap(int x1, int y1, int x2, int y2, int x3, int y3)
     info.x3 = x3;
     info.y3 = y3;
     //printf("get_ap:%d,%d,%d,%d,%d,%d", x1, y1, x2, y2, x3, y3);
+}
+
+int MyObject::start(int sig)
+{
+    Sig = sig;
+    printf("Sig = %d\n", Sig);
 }
 
 class PositionThread : public QThread {
