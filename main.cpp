@@ -5,23 +5,25 @@
 #include <QDebug>
 #include <QtCore/QObject>
 extern "C" {
-#include <location.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-//#include "location.h"
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+#include <string.h>
+#include <location.h>
 
 static void put_coordinate(double x, double y);
 
-int last_x,last_y;
-
+static int last_x,last_y;
+static int g_start = 0;
 /*坐标*/
-double ax,ay,bx,by,cx,cy,zx,zy;
+static double ax,ay,bx,by,cx,cy,zx,zy;
 
 /*距离*/
-double la,lb,lc;
-double cx1,cy1,cx2,cy2,cx3,cy3,cx4,cy4;
+static double la,lb,lc;
+static double cx1,cy1,cx2,cy2,cx3,cy3,cx4,cy4;
 
 int location(struct pointinfo * pInfo)
 {
@@ -222,6 +224,8 @@ int location(struct pointinfo * pInfo)
     return 0;
 }
 
+
+
 static void put_coordinate(double x, double y)
 {
     last_x = (int)x;
@@ -236,14 +240,165 @@ void get_coordinate(int *x,int *y)
     return;
 }
 
+static int set_opt(int fd,int nSpeed,int nBits,char nEvent,int nStop);
+static struct pointinfo * recv_packet(unsigned char * data);
+
+static int fd = 0;
+
+static int set_opt(int fd,int nSpeed,int nBits,char nEvent,int nStop)
+{
+    struct termios newtio,oldtio;
+    if(tcgetattr(fd,&oldtio)!=0)
+    {
+        perror("error:SetupSerial 3\n");
+        return -1;
+    }
+    bzero(&newtio,sizeof(newtio));
+    /*使能串口接收*/
+    newtio.c_cflag |= CLOCAL | CREAD;
+    newtio.c_cflag &= ~CSIZE;
+
+    newtio.c_lflag &=~ICANON;/*原始模式*/
+
+    //newtio.c_lflag |=ICANON; /*标准模式*/
+
+    /*设置串口数据位*/
+    switch(nBits)
+    {
+        case 7:
+            newtio.c_cflag |= CS7;
+            break;
+        case 8:
+            newtio.c_cflag |=CS8;
+            break;
+    }
+    /*设置奇偶校验位*/
+    switch(nEvent)
+
+    {
+        case 'O':
+            newtio.c_cflag |= PARENB;
+            newtio.c_cflag |= PARODD;
+            newtio.c_iflag |= (INPCK | ISTRIP);
+            break;
+        case 'E':
+            newtio.c_iflag |= (INPCK | ISTRIP);
+            newtio.c_cflag |= PARENB;
+            newtio.c_cflag &= ~PARODD;
+            break;
+        case 'N':
+            newtio.c_cflag &=~PARENB;
+            break;
+    }
+    /*设置串口波特率*/
+    switch(nSpeed)
+    {
+        case 2400:
+            cfsetispeed(&newtio,B2400);
+            cfsetospeed(&newtio,B2400);
+            break;
+        case 4800:
+            cfsetispeed(&newtio,B4800);
+            cfsetospeed(&newtio,B4800);
+            break;
+        case 9600:
+            cfsetispeed(&newtio,B9600);
+            cfsetospeed(&newtio,B9600);
+            break;
+        case 115200:
+            cfsetispeed(&newtio,B115200);
+            cfsetospeed(&newtio,B115200);
+            break;
+        case 460800:
+            cfsetispeed(&newtio,B460800);
+            cfsetospeed(&newtio,B460800);
+            break;
+        default:
+            cfsetispeed(&newtio,B9600);
+            cfsetospeed(&newtio,B9600);
+            break;
+    }
+    /*设置停止位*/
+    if(nStop == 1)
+        newtio.c_cflag &= ~CSTOPB;
+    else if(nStop == 2)
+        newtio.c_cflag |= CSTOPB;
+    newtio.c_cc[VTIME] = 1;
+    newtio.c_cc[VMIN] = 0;
+    tcflush(fd,TCIFLUSH);
+
+    if(tcsetattr(fd,TCSANOW,&newtio)!=0)
+    {
+        perror("com set error\n");
+        return -1;
+    }
+    return 0;
+}
+static struct pointinfo * recv_packet(unsigned char * data)
+{
+    struct pointinfo * pInfo;
+    pInfo = (struct pointinfo *)malloc(sizeof(struct pointinfo));
+    pInfo->x1 = data[1];
+    pInfo->y1 = data[2];
+    pInfo->x2 = data[4];
+    pInfo->y2 = data[5];
+    pInfo->x3 = data[7];
+    pInfo->y3 = data[8];
+    pInfo->dist1 = data[3];
+    pInfo->dist2 = data[6];
+    pInfo->dist3 = data[9];
+    return pInfo;
+}
+
+int open_serial(char * dev_name)
+{
+    int ret;
+
+    fd = open(dev_name, O_RDWR|O_NOCTTY);
+    if(-1 == fd)
+    {
+    return -1;
+    }
+
+    ret = set_opt(fd,115200,8,'N',1);
+    if(ret == -1)
+    {
+         return ret;
+    }
+
+    return 0;
+}
+
+void cal_coordinate(void)
+{
+    int len;
+    unsigned char data [9];
+    struct pointinfo *pInfo;
+
+    memset(data,0,9);
+    len = read(fd, data, 9);
+    if( len >0 || len == 9)
+    {
+        pInfo = recv_packet(data);
+        location(pInfo);
+        free(pInfo);
+    }
+    return;
+}
+
+void close_serial(void)
+{
+   close(fd);
+   return;
+}
+
 
 }
 
-int global_apxX=0;
-int global_apxY=0;
-int d1,d2,d3;
-int Sig = 0;
-struct pointinfo info;
+static int global_apxX=0;
+static int global_apxY=0;
+//static int d1,d2,d3;
+static struct pointinfo info;
 
 class MyObject : public QObject
 {
@@ -257,12 +412,11 @@ public:
     Q_INVOKABLE int dis2();
     Q_INVOKABLE int dis3();
     Q_INVOKABLE int get_ap(int x1, int y1, int x2, int y2, int x3, int y3);
-    Q_INVOKABLE int start(int sig);
+    Q_INVOKABLE void get_start(int flag);
 };
 MyObject::MyObject(QObject *parent)
 {
-
-
+    (void)parent;
 }
 MyObject::~MyObject()
 {
@@ -298,6 +452,12 @@ int MyObject::dis3()
     return info.dist3;
 }
 
+void MyObject::get_start(int flag)
+{
+    g_start = flag;
+    return;
+}
+
 int MyObject::get_ap(int x1, int y1, int x2, int y2, int x3, int y3)
 {
     info.x1 = x1;
@@ -309,33 +469,42 @@ int MyObject::get_ap(int x1, int y1, int x2, int y2, int x3, int y3)
     //printf("get_ap:%d,%d,%d,%d,%d,%d", x1, y1, x2, y2, x3, y3);
 }
 
-int MyObject::start(int sig)
-{
-    Sig = sig;
-    printf("Sig = %d\n", Sig);
-}
-
 class PositionThread : public QThread {
 public:
     void run();
+    void stop();
+    int exit;
 };
 
-
-// Algorithm
-
-
-
+void PositionThread::stop()
+{
+    exit = 1;
+}
 void PositionThread::run()
 {
-
-#if 0
-    //open_serial(/dev/ttyUSB0);
-    while(1){
-        //cal_coordinate(void);
-        get_coordinate(&global_apxX, &global_apxY);
-
+#if 1
+    while(1)
+    {
+        if(g_start == 1)
+            break;
+        if(exit == 1)
+            return;
+        sleep(1);
     }
-    //close_serial();
+
+    if(open_serial("/dev/ttyUSB0") < 0)
+    {
+        printf("open serial fialed!!!!!!\n");
+        return;
+    }
+    while(1){
+        if(exit == 1)
+            break;
+        cal_coordinate();
+        get_coordinate(&global_apxX, &global_apxY);
+        sleep(1);
+    }
+    close_serial();
 #else
     while(1){
         struct pointinfo Info;
@@ -372,9 +541,10 @@ int main(int argc, char *argv[])
 
 
     PositionThread mythread;
-    mythread.start();
+
     qmlRegisterType<MyObject>("an.Qt.QmlObject",1,0,"QmlObject");
 
+    mythread.start();
     QQmlApplicationEngine engine;
 
 
@@ -387,6 +557,8 @@ int main(int argc, char *argv[])
     if (engine.rootObjects().isEmpty())
         return -1;
 
+    mythread.stop();
+    sleep(2);
     return app.exec();
 }
 #include <main.moc>
